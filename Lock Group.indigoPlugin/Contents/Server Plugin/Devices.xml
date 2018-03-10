@@ -1,0 +1,37 @@
+<?xml version='1.0'?>
+<Devices>
+	<Device type='relay' id='lockgroup'>
+	    <Name>Lock Group</Name>
+	    <ConfigUI>
+			<Field id='IsLockSubType' type='checkbox' defaultValue='true' hidden='true' />
+	        <Field id='statusLogic' type='menu' defaultValue='all'>
+	            <Label>Status Logic:</Label>
+                <List>
+                    <Option value='all'>Locked when ALL members locked</Option>
+                    <Option value='any'>Locked when ANY member locked</Option>
+                </List>
+            </Field>
+            <Field id='locks' type='list' rows='8'>
+                <Label>Select Locks:</Label>
+                <List class='self' method='getLockDeviceList'/>
+            </Field>
+        </ConfigUI>
+		<States>
+			<State id='allLocked'>
+                <ValueType>Boolean</ValueType>
+				<TriggerLabel>All Members Locked</TriggerLabel>
+                <ControlPageLabel>All Members Locked</ControlPageLabel>
+			</State>
+			<State id='anyLocked'>
+                <ValueType>Boolean</ValueType>
+				<TriggerLabel>Any Member Locked</TriggerLabel>
+                <ControlPageLabel>Any Member Locked</ControlPageLabel>
+			</State>
+			<State id='numLocked'>
+                <ValueType>Number</ValueType>
+				<TriggerLabel>Number of Members Locked</TriggerLabel>
+                <ControlPageLabel>Number of Members Locked</ControlPageLabel>
+			</State>
+		</States>
+    </Device>
+</Devices>
