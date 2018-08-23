@@ -115,11 +115,10 @@ class Plugin(indigo.PluginBase):
             # update local copy (will be removed/overwritten if communication is stopped/re-started)
             indigo.PluginBase.deviceUpdated(self, oldDev, newDev)
             if newDev.id in self.deviceDict:
-                self.deviceDict[newDev.id].refresh(newDev)
+                self.deviceDict[newDev.id].selfUpdated(newDev)
 
-        # speedcontrol device
         elif isinstance(newDev, indigo.RelayDevice):
-            for devId, device in self.deviceDict.items():
+            for device in self.deviceDict.values():
                 device.lockUpdated(oldDev, newDev)
 
     #-------------------------------------------------------------------------------
@@ -149,6 +148,7 @@ class Plugin(indigo.PluginBase):
     # Menu Methods
     #-------------------------------------------------------------------------------
     def checkForUpdates(self):
+        self.nextCheck = time.time() + k_updateCheckHours*60*60
         try:
             self.updater.checkForUpdate()
         except Exception as e:
@@ -158,7 +158,6 @@ class Plugin(indigo.PluginBase):
             else:
                 self.logger.error(msg)
                 self.logger.debug(e)
-        self.nextCheck = time.time() + k_updateCheckHours*60*60
 
     #-------------------------------------------------------------------------------
     def updatePlugin(self):
@@ -196,7 +195,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug("LockGroup.__init__: {}".format(device.id))
 
             self.id = device.id
-            self.refresh(device)
+            self.selfUpdated(device)
 
             self.lockDict = dict()
             for lockId in self.props.get('locks',[]):
@@ -228,7 +227,7 @@ class Plugin(indigo.PluginBase):
         #-------------------------------------------------------------------------------
         # device updated methods
         #-------------------------------------------------------------------------------
-        def refresh(self, device=None):
+        def selfUpdated(self, device=None):
             if not device:
                 device  = indigo.devices[self.id]
             self.logger.debug("LockGroup.refresh: {}".format(device.name))
@@ -254,11 +253,11 @@ class Plugin(indigo.PluginBase):
                 self.states['onOffState'] = self.states['allLocked']
             else:
                 self.states['onOffState'] = self.states['anyLocked']
-            
+
             if self.states != self.device.states:
                 newStates = []
                 for key, value in self.states.items():
                     if self.device.states[key] != value:
-                        self.logger.debug('{}:{}'.format(key,value))
+                        self.logger.debug('{:>12}: {}'.format(key,value))
                         newStates.append({'key':key,'value':value})
                 self.device.updateStatesOnServer(newStates)
