@@ -123,11 +123,11 @@ class Plugin(indigo.PluginBase):
             lockGroup.toggle()
         # STATUS REQUEST
         elif action.deviceAction == indigo.kUniversalAction.RequestStatus:
-            self.logger.info('"{}" status update'.format(device.name))
+            self.logger.info(f'"{device.name}" status update')
             lockGroup.updateGroup()
         # UNKNOWN
         else:
-            self.logger.debug('"{}" {} request ignored'.format(dev.name, unicode(action.speedControlAction)))
+            self.logger.debug(f'"{device.name}" {str(action.speedControlAction)} request ignored')
 
     #-------------------------------------------------------------------------------
     # Menu Methods
@@ -156,7 +156,7 @@ class Plugin(indigo.PluginBase):
         #-------------------------------------------------------------------------------
         def __init__(self, device, logger):
             self.logger = logger
-            self.logger.debug("LockGroup.__init__: {}".format(device.id))
+            self.logger.debug(f'LockGroup.__init__: {device.id}')
 
             self.id = device.id
             self.selfUpdated(device)
@@ -171,13 +171,13 @@ class Plugin(indigo.PluginBase):
         # action methods
         #-------------------------------------------------------------------------------
         def lock(self):
-            self.logger.info('"{}" lock'.format(self.name))
+            self.logger.info(f'"{self.name}" lock')
             for lockId, lock in self.lockDict.items():
                 indigo.device.lock(lockId)
 
         #-------------------------------------------------------------------------------
         def unlock(self):
-            self.logger.info('"{}" unlock'.format(self.name))
+            self.logger.info(f'"{self.name}" unlock')
             for lockId, lock in self.lockDict.items():
                 indigo.device.unlock(lockId)
 
@@ -194,7 +194,7 @@ class Plugin(indigo.PluginBase):
         def selfUpdated(self, device=None):
             if not device:
                 device  = indigo.devices[self.id]
-            self.logger.debug("LockGroup.refresh: {}".format(device.name))
+            self.logger.debug(f'LockGroup.refresh: {device.name}')
             self.device = device
             self.name   = device.name
             self.props  = device.pluginProps
@@ -203,13 +203,13 @@ class Plugin(indigo.PluginBase):
         #-------------------------------------------------------------------------------
         def lockUpdated(self, oldDev, newDev):
             if newDev.id in self.lockDict:
-                self.logger.debug("LockGroup.lockUpdated: {} ({})".format(self.name, newDev.name))
+                self.logger.debug(f'LockGroup.lockUpdated: {self.name} ({newDev.name})')
                 self.lockDict[newDev.id] = indigo.devices[newDev.id]
                 self.updateGroup()
 
         #-------------------------------------------------------------------------------
         def updateGroup(self):
-            self.logger.debug("LockGroup.updateGroup: {}".format(self.name))
+            self.logger.debug(f'LockGroup.updateGroup: {self.name}')
             self.states['anyLocked'] = any(lock.onState for lock in self.lockDict.values())
             self.states['allLocked'] = all(lock.onState for lock in self.lockDict.values())
             self.states['numLocked'] = sum(lock.onState for lock in self.lockDict.values())
@@ -222,6 +222,6 @@ class Plugin(indigo.PluginBase):
                 newStates = []
                 for key, value in self.states.items():
                     if self.device.states[key] != value:
-                        self.logger.debug('{:>12}: {}'.format(key,value))
+                        self.logger.debug(f'{key:>12}: {value}')
                         newStates.append({'key':key,'value':value})
                 self.device.updateStatesOnServer(newStates)
